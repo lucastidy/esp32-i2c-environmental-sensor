@@ -3,10 +3,9 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include "esp_err.h"
-#include "i2c_init.h"
 
 #define AHT20_I2C_ADDRESS        0x38
-#define AHT20_I2C_PORT           I2C_MASTER_PORT  // use shared bus
+#define AHT20_I2C_PORT           I2C_NUM_0  // use shared bus
 #define AHT20_I2C_TIMEOUT_MS     1000
 
 #ifdef __cplusplus
