@@ -2,6 +2,9 @@
 #include "aht20.h"
 #include "bmp280.h"
 
+// cpp wrapper for OTA self test
+#include "boot_self_test.h"
+
 #include "esp_log.h"
 #include "esp_ota_ops.h"
 #include "esp_system.h"
@@ -66,14 +69,7 @@ void app_main(void) {
 
 static bool ota_self_test(void)
 {
-    
-    bool ok = true;
-
-    ok &= i2c_bus_init();
-    ok &= i2c_bus_probe(0x38);
-    ok &= i2c_bus_probe(0x77);
-
-    return ok;
+    return boot_self_test_run();
 }
 
 static void ota_mark_if_pending(void) {
