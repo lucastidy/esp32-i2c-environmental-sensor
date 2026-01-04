@@ -1,5 +1,5 @@
 idf_component_register(
-    SRCS "env_sensor.c" "i2c_init.c"
+    SRCS "env_sensor.c" "i2c_init.c" "boot_self_test.cpp"
     INCLUDE_DIRS "."
     REQUIRES aht20 bmp280
     PRIV_REQUIRES app_update

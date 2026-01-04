@@ -25,7 +25,7 @@ static int16_t dig_P2, dig_P3, dig_P4, dig_P5, dig_P6, dig_P7, dig_P8, dig_P9;
 
 static int32_t t_fine;
 
-// Low-level read
+// read
 static esp_err_t bmp280_read_reg(uint8_t reg, uint8_t *data, size_t len) {
     i2c_cmd_handle_t cmd = i2c_cmd_link_create();
     i2c_master_start(cmd);
@@ -40,7 +40,7 @@ static esp_err_t bmp280_read_reg(uint8_t reg, uint8_t *data, size_t len) {
     return err;
 }
 
-// Low-level write
+// write
 static esp_err_t bmp280_write_reg(uint8_t reg, uint8_t value) {
     i2c_cmd_handle_t cmd = i2c_cmd_link_create();
     i2c_master_start(cmd);
@@ -86,7 +86,7 @@ static uint32_t bmp280_compensate_pressure(int32_t adc_P) {
     var1 = ((var1 * var1 * (int64_t)dig_P3) >> 8) +
            ((var1 * (int64_t)dig_P2) << 12);
     var1 = (((((int64_t)1) << 47) + var1)) * ((int64_t)dig_P1) >> 33;
-    if (var1 == 0) return 0; // avoid exception
+    if (var1 == 0) return 0; // to avoid exception?
     p = 1048576 - adc_P;
     p = (((p << 31) - var2) * 3125) / var1;
     var1 = (((int64_t)dig_P9) * (p >> 13) * (p >> 13)) >> 25;
@@ -128,7 +128,7 @@ esp_err_t bmp280_read(float *temperature, float *pressure) {
     int32_t temp_raw = bmp280_compensate_temp(adc_T);
     uint32_t press_raw = bmp280_compensate_pressure(adc_P);
 
-    *temperature = temp_raw / 100.0f;   // Celsius
+    *temperature = temp_raw / 100.0f;   // convert to celsius
 
     float pressure_pa = press_raw / 256.0f;   // convert from Q24.8 to Pa
     *pressure = pressure_pa / 100.0f;         // Pa to hPa

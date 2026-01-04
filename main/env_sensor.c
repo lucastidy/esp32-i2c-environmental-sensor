@@ -40,7 +40,7 @@ static void sensor_task(void *arg)
         // Feed watchdog once per loop
         ESP_ERROR_CHECK(esp_task_wdt_reset());
 
-        vTaskDelay(pdMS_TO_TICKS(2000));
+        vTaskDelay(pdMS_TO_TICKS(500));
     }
 }
 

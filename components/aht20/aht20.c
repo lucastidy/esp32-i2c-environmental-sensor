@@ -26,6 +26,9 @@ esp_err_t aht20_init(void) {
     esp_err_t ret = aht20_write(AHT20_I2C_ADDRESS, init_cmd, 3);
     if (ret != ESP_OK) {
         ESP_LOGE(TAG, "AHT20 init failed: %s", esp_err_to_name(ret));
+    } else {
+        ESP_LOGI(TAG, "AHT20 init OK (chip ID 0x%02X)", AHT20_I2C_ADDRESS);
+
     }
     vTaskDelay(pdMS_TO_TICKS(10));
     return ret;

@@ -1,8 +1,8 @@
 #include <cstdint>
 
 extern "C" {
-    bool i2c_quick_init(void);
-    bool i2c_probe(uint8_t addr);
+    bool i2c_bus_init(void);
+    bool i2c_bus_probe(uint8_t addr);
 }
 
 namespace {
