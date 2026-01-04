@@ -5,6 +5,7 @@
 // cpp wrapper for OTA self test
 #include "boot_self_test.h"
 
+#include "esp_task_wdt.h" // watchdog timer
 #include "esp_log.h"
 #include "esp_ota_ops.h"
 #include "esp_system.h"
@@ -16,6 +17,32 @@ static bool ota_self_test(void);
 
 static const char *TAG = "ENV"; 
 static const char *BOOT_TAG = "BOOT";
+
+static void sensor_task(void *arg)
+{
+    // wd: monitor this task
+    ESP_ERROR_CHECK(esp_task_wdt_add(NULL));
+
+    while (1) {
+        float temp_aht, hum;
+        float temp_bmp, press;
+
+        if (aht20_read(&temp_aht, &hum)) {
+            printf("AHT20: Temp = %.2f°C | Humidity = %.2f%%\n", temp_aht, hum);
+        }
+
+        if (bmp280_read(&temp_bmp, &press) == ESP_OK) {
+            printf("BMP280: Temp = %.2f °C | Pressure = %.2f hPa\n", temp_bmp, press);
+        } else {
+            ESP_LOGE("BMP280", "Failed to read sensor data");
+        }
+
+        // Feed watchdog once per loop
+        ESP_ERROR_CHECK(esp_task_wdt_reset());
+
+        vTaskDelay(pdMS_TO_TICKS(2000));
+    }
+}
 
 void app_main(void) {
 
@@ -49,22 +76,9 @@ void app_main(void) {
         return;
     }
 
-    while (1) {
-        float temp_aht, hum;
-        float temp_bmp, press;
+    xTaskCreate(sensor_task, "sensor_task", 4096, NULL, 5, NULL);
 
-        if (aht20_read(&temp_aht, &hum)) {
-            printf("AHT20: Temp = %.2f°C | Humidity = %.2f%%\n", temp_aht, hum);
-        }
-
-        if (bmp280_read(&temp_bmp, &press) == ESP_OK) {
-            printf("BMP280: Temp = %.2f °C | Pressure = %.2f hPa\n", temp_bmp, press);
-        } else {
-            ESP_LOGE("BMP280", "Failed to read sensor data");
-        }
-
-        vTaskDelay(pdMS_TO_TICKS(2000));
-    }
+    return;
 }
 
 static bool ota_self_test(void)
